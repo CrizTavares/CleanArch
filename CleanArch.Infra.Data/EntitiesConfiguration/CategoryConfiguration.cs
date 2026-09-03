@@ -12,10 +12,10 @@ namespace CleanArch.Infra.Data.EntitiesConfiguration
             b.Property(p => p.Name).HasMaxLength(100).IsRequired();
 
             b.HasData(
-                new Category("Material Escolar"),
-                new Category("Eletrônicos"),
-                new Category("Roupas"),
-                new Category("Alimentos")
+                new Category(1, "Material Escolar"),
+                new Category(2, "Eletrônicos"),
+                new Category(3, "Roupas"),
+                new Category(4, "Alimentos")
                 );
         }
     }
