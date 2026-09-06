@@ -1,6 +1,9 @@
-﻿using CleanArch.Application.DTOs;
+﻿using AutoMapper;
+using CleanArch.Application.DTOs;
+using CleanArch.Application.Features.Products.Commands;
+using CleanArch.Application.Features.Products.Queries;
 using CleanArch.Application.Interfaces;
-using CleanArch.Application.Services;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -8,14 +11,19 @@ namespace CleanArch.WebUI.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly IProductService _productService;
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
         private readonly ICategoryService _categoryService;
         private readonly IWebHostEnvironment _environment;
 
-        public ProductsController(IProductService productAppService,
-            ICategoryService categoryService, IWebHostEnvironment environment)
+        public ProductsController(
+            IMediator mediator,
+            IMapper mapper,
+            ICategoryService categoryService,
+            IWebHostEnvironment environment)
         {
-            _productService = productAppService;
+            _mediator = mediator;
+            _mapper = mapper;
             _categoryService = categoryService;
             _environment = environment;
         }
@@ -23,37 +31,44 @@ namespace CleanArch.WebUI.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var products = await _productService.GetProductsAsync();
-            return View(products);
+            var products = await _mediator.Send(new GetProductsQuery());
+            var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
+            return View(productsDto);
         }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ViewBag.CategoryId =
-            new SelectList(await _categoryService.GetCategoriesAsync(), "Id", "Name");
-
+            var categories = await _categoryService.GetCategoriesAsync();
+            ViewBag.CategoryId = new SelectList(categories, "Id", "Name");
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductDTO productDto)
         {
             if (ModelState.IsValid)
             {
-                await _productService.AddAsync(productDto);
+                var command = _mapper.Map<ProductCreateCommand>(productDto);
+                await _mediator.Send(command);
                 return RedirectToAction(nameof(Index));
             }
+
+            var categories = await _categoryService.GetCategoriesAsync();
+            ViewBag.CategoryId = new SelectList(categories, "Id", "Name", productDto.CategoryId);
             return View(productDto);
         }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-            var productDto = await _productService.GetByIdAsync(id);
 
-            if (productDto == null) return NotFound();
+            var product = await _mediator.Send(new GetProductByIdQuery(id.Value));
+            if (product == null) return NotFound();
+
+            var productDto = _mapper.Map<ProductDTO>(product);
 
             var categories = await _categoryService.GetCategoriesAsync();
             ViewBag.CategoryId = new SelectList(categories, "Id", "Name", productDto.CategoryId);
@@ -61,50 +76,56 @@ namespace CleanArch.WebUI.Controllers
             return View(productDto);
         }
 
-        [HttpPost()]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ProductDTO productDto)
         {
             if (ModelState.IsValid)
             {
-                await _productService.UpdateAsync(productDto);
+                var command = _mapper.Map<ProductUpdateCommand>(productDto);
+                await _mediator.Send(command);
                 return RedirectToAction(nameof(Index));
             }
+
+            var categories = await _categoryService.GetCategoriesAsync();
+            ViewBag.CategoryId = new SelectList(categories, "Id", "Name", productDto.CategoryId);
             return View(productDto);
         }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-                return NotFound();
+            if (id == null) return NotFound();
 
-            var productDto = await _productService.GetByIdAsync(id);
+            var product = await _mediator.Send(new GetProductByIdQuery(id.Value));
+            if (product == null) return NotFound();
 
-            if (productDto == null) return NotFound();
-
+            var productDto = _mapper.Map<ProductDTO>(product);
             return View(productDto);
         }
 
-        [HttpPost(), ActionName("Delete")]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _productService.RemoveAsync(id);
-            return RedirectToAction("Index");
+            await _mediator.Send(new ProductRemoveCommand(id));
+            return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-            var productDto = await _productService.GetByIdAsync(id);
 
-            if (productDto == null) return NotFound();
-            var wwwroot = _environment.WebRootPath;
-            var image = Path.Combine(wwwroot, "images\\" + productDto.Image);
-            var exists = System.IO.File.Exists(image);
-            ViewBag.ImageExist = exists;
+            var product = await _mediator.Send(new GetProductByIdQuery(id.Value));
+            if (product == null) return NotFound();
+
+            var productDto = _mapper.Map<ProductDTO>(product);
+
+            var imagePath = Path.Combine(_environment.WebRootPath, "images", productDto.Image ?? string.Empty);
+            ViewBag.ImageExist = System.IO.File.Exists(imagePath);
 
             return View(productDto);
         }
-
     }
 }
