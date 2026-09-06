@@ -27,6 +27,7 @@ namespace CleanArch.Infra.IoC
 
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICategoryService, CategoryService>();
 
             services.AddScoped<IAuthenticate, AuthenticateService>();
