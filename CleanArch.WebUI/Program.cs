@@ -1,3 +1,4 @@
+using CleanArch.Domain.Account;
 using CleanArch.Infra.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,15 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+using (var scope = app.Services.CreateScope())
+{
+    var seedUserRoleInitial = scope.ServiceProvider.GetRequiredService<ISeedUserRoleInitial>();
+
+    await seedUserRoleInitial.SeedRolesAsync();
+    await seedUserRoleInitial.SeedUsersAsync();
+}
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
