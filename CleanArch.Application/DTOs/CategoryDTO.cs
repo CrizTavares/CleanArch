@@ -9,6 +9,6 @@ namespace CleanArch.Application.DTOs
         [Required(ErrorMessage = "The Name is required")]
         [MinLength(3, ErrorMessage = "The Name must be at least 3 characters long")]
         [MaxLength(100, ErrorMessage = "The Name cannot exceed 100 characters")]
-        public string Name { get; private set; }
+        public string Name { get; set; }
     }
 }
