@@ -1,5 +1,8 @@
-﻿using CleanArch.Application.DTOs;
-using CleanArch.Application.Interfaces;
+﻿using AutoMapper;
+using CleanArch.Application.DTOs;
+using CleanArch.Application.Features.Products.Commands;
+using CleanArch.Application.Features.Products.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArch.API.Controllers
@@ -9,75 +12,85 @@ namespace CleanArch.API.Controllers
     [Produces("application/json")]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductService _productService;
-       public ProductsController(IProductService productService)
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
+
+        public ProductsController(IMediator mediator, IMapper mapper)
         {
-            _productService = productService;
+            _mediator = mediator;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> Get()
         {
-            var produtos = await _productService.GetProducts();
-            if (produtos == null)
+            var products = await _mediator.Send(new GetProductsQuery());
+
+            if (products == null)
             {
                 return NotFound("Products not found");
             }
-            return Ok(produtos);
+
+            var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
+            return Ok(productsDto);
         }
 
-        [HttpGet("{id}", Name = "GetProduct")]
+        [HttpGet("{id:int}", Name = "GetProduct")]
         public async Task<ActionResult<ProductDTO>> Get(int id)
         {
-            var produto = await _productService.GetById(id);
-            if (produto == null)
+            var product = await _mediator.Send(new GetProductByIdQuery(id));
+
+            if (product == null)
             {
                 return NotFound("Product not found");
             }
-            return Ok(produto);
+
+            var productDto = _mapper.Map<ProductDTO>(product);
+            return Ok(productDto);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] ProductDTO produtoDto)
+        public async Task<ActionResult> Post([FromBody] ProductDTO productDto)
         {
-            if (produtoDto == null)
+            if (productDto == null)
                 return BadRequest("Data Invalid");
 
-            await _productService.Add(produtoDto);
+            var command = _mapper.Map<ProductCreateCommand>(productDto);
+            var createdProduct = await _mediator.Send(command);
 
-            return new CreatedAtRouteResult("GetProduct",
-                new { id = produtoDto.Id }, produtoDto);
+            var createdProductDto = _mapper.Map<ProductDTO>(createdProduct);
+
+            return CreatedAtRoute("GetProduct", new { id = createdProductDto.Id }, createdProductDto);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] ProductDTO produtoDto)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromBody] ProductDTO productDto)
         {
-            if (id != produtoDto.Id)
+            if (productDto == null || id != productDto.Id)
             {
                 return BadRequest("Data invalid");
             }
 
-            if (produtoDto == null)
-                return BadRequest("Data invalid");
+            var command = _mapper.Map<ProductUpdateCommand>(productDto);
+            var updatedProduct = await _mediator.Send(command);
 
-            await _productService.Update(produtoDto);
-
-            return Ok(produtoDto);
+            var updatedProductDto = _mapper.Map<ProductDTO>(updatedProduct);
+            return Ok(updatedProductDto);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult<ProductDTO>> Delete(int id)
         {
-            var produtoDto = await _productService.GetById(id);
+            var command = new ProductRemoveCommand(id);
+            var deletedProduct = await _mediator.Send(command);
 
-            if (produtoDto == null)
+            if (deletedProduct == null)
             {
                 return NotFound("Product not found");
             }
 
-            await _productService.Remove(id);
-
-            return Ok(produtoDto);
+            var productDto = _mapper.Map<ProductDTO>(deletedProduct);
+            return Ok(productDto);
         }
     }
 }
