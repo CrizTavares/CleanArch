@@ -8,7 +8,7 @@ namespace CleanArch.Application.Services
 {
     public class CategoryService : ICategoryService
     {
-        private ICategoryRepository _categoryRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
 
         public CategoryService(ICategoryRepository categoryRepository, IMapper mapper)
@@ -17,34 +17,34 @@ namespace CleanArch.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CategoryDTO>> GetCategoriesAsync()
+        public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
         {
             var categoriesEntity = await _categoryRepository.GetCategoriesAsync();
-            return _mapper.Map<IEnumerable<CategoryDTO>>(categoriesEntity);
+            return _mapper.Map<IEnumerable<CategoryDto>>(categoriesEntity);
         }
 
-        public async Task<CategoryDTO> GetByIdAsync(int? id)
+        public async Task<CategoryDto> GetByIdAsync(int? id)
         {
             var categoryEntity = await _categoryRepository.GetCategoryByIdAsync(id);
-            return _mapper.Map<CategoryDTO>(categoryEntity);
+            return _mapper.Map<CategoryDto>(categoryEntity);
         }
 
-        public async Task AddAsync(CategoryDTO categoryDto)
+        public Task AddAsync(CategoryDto categoryDto)
         {
             var categoryEntity = _mapper.Map<Category>(categoryDto);
-            await _categoryRepository.CreateAsync(categoryEntity);
+            return _categoryRepository.CreateAsync(categoryEntity);
         }
 
-        public async Task UpdateAsync(CategoryDTO categoryDto)
+        public Task UpdateAsync(CategoryDto categoryDto)
         {
             var categoryEntity = _mapper.Map<Category>(categoryDto);
-            await _categoryRepository.UpdateAsync(categoryEntity);
+            return _categoryRepository.UpdateAsync(categoryEntity);
         }
 
-        public async Task RemoveAsync(int? id)
+        public Task RemoveAsync(int? id)
         {
             var categoryEntity = _categoryRepository.GetCategoryByIdAsync(id).Result;
-            await _categoryRepository.RemoveAsync(categoryEntity);
+            return _categoryRepository.RemoveAsync(categoryEntity);
         }
     }
 }

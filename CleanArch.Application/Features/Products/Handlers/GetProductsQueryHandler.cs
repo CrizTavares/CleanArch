@@ -14,10 +14,10 @@ namespace CleanArch.Application.Products.Handlers
             _productRepository = productRepository;
         }
 
-        public async Task<IEnumerable<Product>> Handle(GetProductsQuery request, 
+        public Task<IEnumerable<Product>> Handle(GetProductsQuery request, 
             CancellationToken cancellationToken)
         {
-            return await _productRepository.GetProductsAsync();
+            return _productRepository.GetProductsAsync();
         }
     }
 }

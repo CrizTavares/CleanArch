@@ -47,7 +47,7 @@ namespace CleanArch.Domain.Tests
         [Fact(DisplayName = "Create Product With Null Image Name")]
         public void CreateProduct_WithNullImageName_NoDomainException()
         {
-            Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, null);
+            Action action = () => new Product(1, "Product Name", "Product Description", 9.99m, 99, String.Empty);
             action.Should().NotThrow<CleanArch.Domain.Validation.DomainExceptionValidation>();
         }
 

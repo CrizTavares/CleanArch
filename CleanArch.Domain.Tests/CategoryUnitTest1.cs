@@ -10,7 +10,7 @@ namespace CleanArch.Domain.Tests
         {
             Action a = () => new Category(1, "Category Name");
             a.Should()
-                .NotThrow<CleanArch.Domain.Validation.DomainExceptionValidation>();
+                .NotThrow<Validation.DomainExceptionValidation>();
         }
 
         [Fact(DisplayName = "Create Category With Negative Id Value")]
@@ -18,7 +18,7 @@ namespace CleanArch.Domain.Tests
         {
             Action action = () => new Category(-1, "Category Name ");
             action.Should()
-                .Throw<CleanArch.Domain.Validation.DomainExceptionValidation>()
+                .Throw<Validation.DomainExceptionValidation>()
                  .WithMessage("Invalid Id value");
         }
 
@@ -27,7 +27,7 @@ namespace CleanArch.Domain.Tests
         {
             Action action = () => new Category(1, "Ca");
             action.Should()
-                .Throw<CleanArch.Domain.Validation.DomainExceptionValidation>()
+                .Throw<Validation.DomainExceptionValidation>()
                    .WithMessage("Name must be at least 3 characters long");
         }
 
@@ -36,16 +36,16 @@ namespace CleanArch.Domain.Tests
         {
             Action action = () => new Category(1, "");
             action.Should()
-                .Throw<CleanArch.Domain.Validation.DomainExceptionValidation>()
+                .Throw<Validation.DomainExceptionValidation>()
                 .WithMessage("Name is required");
         }
 
         [Fact(DisplayName = "Create Category With Null Name")]
         public void CreateCategory_WithNullNameValue_DomainExceptionInvalidName()
         {
-            Action action = () => new Category(1, null);
+            Action action = () => new Category(1, String.Empty);
             action.Should()
-                .Throw<CleanArch.Domain.Validation.DomainExceptionValidation>()
+                .Throw<Validation.DomainExceptionValidation>()
                 .WithMessage("Name is required");
         }
 

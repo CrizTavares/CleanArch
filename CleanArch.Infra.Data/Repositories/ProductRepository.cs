@@ -7,7 +7,7 @@ namespace CleanArch.Infra.Data.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        private ApplicationDbContext _productContext;
+        private readonly ApplicationDbContext _productContext;
         public ProductRepository(ApplicationDbContext context)
         {
             _productContext = context;
@@ -22,8 +22,14 @@ namespace CleanArch.Infra.Data.Repositories
 
         public async Task<Product> GetProductByIdAsync(int? id)
         {
-            return await _productContext.Products.Include(c => c.Category)
-                .SingleOrDefaultAsync(p => p.Id == id);
+            if (!id.HasValue)
+                throw new ArgumentNullException(nameof(id), "Invalid product ID.");
+
+            var product = await _productContext.Products
+                .Include(c => c.Category)
+                .SingleOrDefaultAsync(p => p.Id == id.Value);
+
+            return product ?? throw new KeyNotFoundException($"Product with ID {id.Value} not found.");
         }
 
         public async Task<IEnumerable<Product>> GetProductsAsync()

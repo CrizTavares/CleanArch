@@ -1,9 +1,11 @@
 ﻿using CleanArch.Application.DTOs;
 using CleanArch.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArch.WebUI.Controllers
 {
+    [Authorize]
     public class CategoriesController : Controller
     {
         private readonly ICategoryService _categoryService;
@@ -26,7 +28,7 @@ namespace CleanArch.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CategoryDTO category)
+        public async Task<IActionResult> Create(CategoryDto category)
         {
             if (ModelState.IsValid)
             {
@@ -46,7 +48,7 @@ namespace CleanArch.WebUI.Controllers
         }
 
         [HttpPost()]
-        public async Task<IActionResult> Edit(CategoryDTO categoryDto)
+        public async Task<IActionResult> Edit(CategoryDto categoryDto)
         {
             if (ModelState.IsValid)
             {
@@ -54,15 +56,17 @@ namespace CleanArch.WebUI.Controllers
                 {
                     await _categoryService.UpdateAsync(categoryDto);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    throw;
+                    // Log the exception or handle it as needed
+                    Console.WriteLine($"An error occurred while updating the category: {ex.Message}");
                 }
                 return RedirectToAction(nameof(Index));
             }
             return View(categoryDto);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet()]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -73,7 +77,7 @@ namespace CleanArch.WebUI.Controllers
 
             if (categoryDto == null) return NotFound();
 
-            return View(categoryDto);
+            return View(nameof(Delete), categoryDto);
         }
 
         [HttpPost(), ActionName("Delete")]
@@ -93,7 +97,7 @@ namespace CleanArch.WebUI.Controllers
             if (categoryDto == null)
                 return NotFound();
 
-            return View(categoryDto);
+            return View(nameof(Details), categoryDto);
         }
     }
 }

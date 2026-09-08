@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanArch.Application.DTOs
 {
-    public class ProductDTO
+    public class ProductDto
     {
         public int Id { get; set; }
 
@@ -13,13 +13,13 @@ namespace CleanArch.Application.DTOs
         [MinLength(3)]
         [MaxLength(100)]
         [DisplayName("Name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "The Description is Required")]
         [MinLength(5)]
         [MaxLength(200)]
         [DisplayName("Description")]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "The Price is Required")]
         [Column(TypeName = "decimal(18,2)")]
@@ -35,7 +35,7 @@ namespace CleanArch.Application.DTOs
 
         [MaxLength(250)]
         [DisplayName("Product Image")]
-        public string Image { get; set; }
+        public string? Image { get; set; }
 
         public Category? Category { get; set; }
 
