@@ -4,6 +4,7 @@ using CleanArch.Application.Features.Products.Commands;
 using CleanArch.Application.Features.Products.Queries;
 using CleanArch.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArch.API.Controllers
@@ -11,6 +12,7 @@ namespace CleanArch.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Produces("application/json")]
+    [Authorize]
     public class ProductsController(IMediator mediator, IMapper mapper) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
