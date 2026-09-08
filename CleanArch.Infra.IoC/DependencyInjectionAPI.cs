@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 namespace CleanArch.Infra.IoC
 {
-    public static class DependencyInjectionAPI
+    public static class DependencyInjectionApi
     {
         public static IServiceCollection AddInfrastructureAPI(this IServiceCollection services,
             IConfiguration configuration)
@@ -31,7 +31,7 @@ namespace CleanArch.Infra.IoC
 
             services.AddScoped<IAuthenticate, AuthenticateService>();
 
-            services.AddAutoMapper(cfg => cfg.AddProfile<DomainToDTOMappingProfile>());
+            services.AddAutoMapper(cfg => cfg.AddProfile<DomainToDtoMappingProfile>());
 
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(AppDomain.CurrentDomain.Load("CleanArch.Application")));

@@ -1,6 +1,7 @@
 ﻿using CleanArch.Application.Features.Products.Commands;
 using CleanArch.Domain.Entities;
 using CleanArch.Domain.Interfaces;
+using CleanArch.Domain.Validation;
 using MediatR;
 
 namespace CleanArch.Application.Products.Handlers
@@ -21,7 +22,7 @@ namespace CleanArch.Application.Products.Handlers
 
             if (product == null)
             {
-                throw new ApplicationException($"Entity could not be found.");
+                throw new DomainExceptionValidation($"Entity could not be found.");
             }
             else
             {

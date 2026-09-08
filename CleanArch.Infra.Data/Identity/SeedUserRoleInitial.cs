@@ -17,7 +17,7 @@ namespace CleanArch.Infra.Data.Identity
 
         public async Task SeedUsersAsync()
         {
-            if (_userManager.FindByEmailAsync("usuario@localhost").Result == null)
+            if (await _userManager.FindByEmailAsync("usuario@localhost") == null)
             {
                 ApplicationUser user = new()
                 {
@@ -30,15 +30,15 @@ namespace CleanArch.Infra.Data.Identity
                     SecurityStamp = Guid.NewGuid().ToString()
                 };
 
-                IdentityResult result = _userManager.CreateAsync(user, "Numsey#2021").Result;
+                IdentityResult result = await _userManager.CreateAsync(user, "Numsey#2021");
 
                 if (result.Succeeded)
                 {
-                    _userManager.AddToRoleAsync(user, "User").Wait();
+                    await _userManager.AddToRoleAsync(user, "User");
                 }
             }
 
-            if (_userManager.FindByEmailAsync("admin@localhost").Result == null)
+            if (await _userManager.FindByEmailAsync("admin@localhost") == null)
             {
                 ApplicationUser user = new()
                 {
@@ -51,11 +51,11 @@ namespace CleanArch.Infra.Data.Identity
                     SecurityStamp = Guid.NewGuid().ToString()
                 };
 
-                IdentityResult result = _userManager.CreateAsync(user, "Numsey#2021").Result;
+                IdentityResult result = await _userManager.CreateAsync(user, "Numsey#2021");
 
                 if (result.Succeeded)
                 {
-                    _userManager.AddToRoleAsync(user, "Admin").Wait();
+                    await _userManager.AddToRoleAsync(user, "Admin");
                 }
             }
 
@@ -64,7 +64,7 @@ namespace CleanArch.Infra.Data.Identity
         public async Task SeedRolesAsync()
         {
 
-            if (!_roleManager.RoleExistsAsync("User").Result)
+            if (!await _roleManager.RoleExistsAsync("User"))
             {
                 IdentityRole role = new()
                 {
@@ -80,7 +80,7 @@ namespace CleanArch.Infra.Data.Identity
                     throw new InvalidOperationException($"Failed to create role User: {string.Join(", ", result.Errors.Select(e => e.Description))}");
                 }
             }
-            if (!_roleManager.RoleExistsAsync("Admin").Result)
+            if (! await _roleManager.RoleExistsAsync("Admin"))
             {
                 IdentityRole role = new()
                 {
@@ -88,7 +88,7 @@ namespace CleanArch.Infra.Data.Identity
                     NormalizedName = "ADMIN"
                 };
 
-                IdentityResult result = _roleManager.CreateAsync(role).Result;
+                IdentityResult result = await _roleManager.CreateAsync(role);
 
                 if (!result.Succeeded)
                 {

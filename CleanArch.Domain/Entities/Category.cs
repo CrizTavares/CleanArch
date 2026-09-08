@@ -4,7 +4,7 @@ namespace CleanArch.Domain.Entities
 {
     public sealed class Category : Entity
     {
-        public string Name { get; private set; }
+        public string Name { get; private set; } = string.Empty;
         public ICollection<Product> Products { get; set; } = [];
 
         public Category(string name)

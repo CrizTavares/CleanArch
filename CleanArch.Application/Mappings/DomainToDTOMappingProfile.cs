@@ -4,12 +4,12 @@ using CleanArch.Domain.Entities;
 
 namespace CleanArch.Application.Mappings
 {
-    public class DomainToDTOMappingProfile : Profile
+    public class DomainToDtoMappingProfile : Profile
     {
-        public DomainToDTOMappingProfile()
+        public DomainToDtoMappingProfile()
         {
-            CreateMap<Category, CategoryDTO>().ReverseMap();
-            CreateMap<Product, ProductDTO>().ReverseMap();
+            CreateMap<Category, CategoryDto>().ReverseMap();
+            CreateMap<Product, ProductDto>().ReverseMap();
         }
     }
 }

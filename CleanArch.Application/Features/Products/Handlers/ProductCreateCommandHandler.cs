@@ -1,6 +1,7 @@
 ﻿using CleanArch.Application.Features.Products.Commands;
 using CleanArch.Domain.Entities;
 using CleanArch.Domain.Interfaces;
+using CleanArch.Domain.Validation;
 using MediatR;
 
 namespace CleanArch.Application.Features.Products.Handlers
@@ -13,17 +14,17 @@ namespace CleanArch.Application.Features.Products.Handlers
             _productRepository = productRepository;
         }
 
-        public async Task<Product> Handle(ProductCreateCommand request, CancellationToken cancellationToken)
+        public Task<Product> Handle(ProductCreateCommand request, CancellationToken cancellationToken)
         {
             var product = new Product(request.Name, request.Description, request.Price, request.Stock, request.Image);
             if (product == null)
             {
-                throw new ApplicationException($"Error creating entity");
+                throw new DomainExceptionValidation($"Error creating entity");
             }
             else
             {
                 product.CategoryId = request.CategoryId;
-                return await _productRepository.CreateAsync(product);
+                return _productRepository.CreateAsync(product);
             }
 
         }

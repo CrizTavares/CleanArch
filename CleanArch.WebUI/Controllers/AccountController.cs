@@ -14,7 +14,7 @@ namespace CleanArch.WebUI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string returnUrl = null)
+        public IActionResult Login(string returnUrl = "Home/Index")
         {
             return View(new LoginViewModel() { ReturnUrl = returnUrl });
         }
@@ -22,6 +22,9 @@ namespace CleanArch.WebUI.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            if (!ModelState.IsValid)            
+                return View(model);            
+
             var result = await _authenticate.Authenticate(model.Email, model.Password);
 
             if (result)
@@ -48,7 +51,12 @@ namespace CleanArch.WebUI.Controllers
         [HttpPost]  
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            var result = await _authenticate.RegisterUser(model.Email, model.Password);
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            bool result = await _authenticate.RegisterUser(model.Email, model.Password);
 
             if (result)
             {
@@ -68,3 +76,4 @@ namespace CleanArch.WebUI.Controllers
         }
     }
 }
+

@@ -6,18 +6,14 @@ namespace CleanArch.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController(ICategoryService categoryService) : ControllerBase
     {
-        private readonly ICategoryService _categoryService;
-        public CategoriesController(ICategoryService categoryService)
-        {
-            _categoryService = categoryService;
-        }
+        private readonly ICategoryService _categoryService = categoryService;
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryDTO>>> Get()
+        public async Task<ActionResult<IEnumerable<CategoryDto>>> Get()
         {
-            var categories = await _categoryService.GetCategoriesAsync();
+            IEnumerable<CategoryDto> categories = await _categoryService.GetCategoriesAsync();
             if (categories == null)
             {
                 return NotFound("Categories not found");
@@ -26,9 +22,9 @@ namespace CleanArch.API.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCategory")]
-        public async Task<ActionResult<CategoryDTO>> Get(int id)
+        public async Task<ActionResult<CategoryDto>> Get(int id)
         {
-            var category = await _categoryService.GetByIdAsync(id);
+            CategoryDto category = await _categoryService.GetByIdAsync(id);
             if (category == null)
             {
                 return NotFound("Category not found");
@@ -37,7 +33,7 @@ namespace CleanArch.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] CategoryDTO categoryDto)
+        public async Task<ActionResult> Post([FromBody] CategoryDto categoryDto)
         {
             if (categoryDto == null)
                 return BadRequest("Invalid Data");
@@ -49,7 +45,7 @@ namespace CleanArch.API.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult> Put(int id,[FromBody] CategoryDTO categoryDto)
+        public async Task<ActionResult> Put(int id,[FromBody] CategoryDto categoryDto)
         {
             if (id != categoryDto.Id)
                 return BadRequest();
@@ -63,9 +59,9 @@ namespace CleanArch.API.Controllers
         }          
         
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult<CategoryDTO>> Delete(int id)
+        public async Task<ActionResult<CategoryDto>> Delete(int id)
         {
-            var category = await _categoryService.GetByIdAsync(id);
+            CategoryDto category = await _categoryService.GetByIdAsync(id);
             if(category == null)
             {
                 return NotFound("Category not found");

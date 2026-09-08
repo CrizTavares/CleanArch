@@ -7,7 +7,7 @@ namespace CleanArch.Infra.Data.Repositories
 {
     public class CategoryRepository : ICategoryRepository
     {
-        private ApplicationDbContext _categoryContext;
+        private readonly ApplicationDbContext _categoryContext;
         public CategoryRepository(ApplicationDbContext context)
         {
             _categoryContext = context;
@@ -23,7 +23,12 @@ namespace CleanArch.Infra.Data.Repositories
 
         public async Task<Category> GetCategoryByIdAsync(int? id)
         {
-            return await _categoryContext.Categories.FindAsync(id);
+            if (!id.HasValue)
+                throw new ArgumentNullException(nameof(id), "Invalid category ID.");
+
+            var category = await _categoryContext.Categories.FindAsync(id.Value);
+
+            return category ?? throw new KeyNotFoundException($"Category with ID {id.Value} was not found.");
         }
 
         public async Task<IEnumerable<Category>> GetCategoriesAsync()

@@ -33,7 +33,7 @@ namespace CleanArch.WebUI.Controllers
         public async Task<IActionResult> Index()
         {
             var products = await _mediator.Send(new GetProductsQuery());
-            var productsDto = _mapper.Map<IEnumerable<ProductDTO>>(products);
+            var productsDto = _mapper.Map<IEnumerable<ProductDto>>(products);
             return View(productsDto);
         }
 
@@ -47,7 +47,7 @@ namespace CleanArch.WebUI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProductDTO productDto)
+        public async Task<IActionResult> Create(ProductDto productDto)
         {
             if (ModelState.IsValid)
             {
@@ -69,7 +69,7 @@ namespace CleanArch.WebUI.Controllers
             var product = await _mediator.Send(new GetProductByIdQuery(id.Value));
             if (product == null) return NotFound();
 
-            var productDto = _mapper.Map<ProductDTO>(product);
+            var productDto = _mapper.Map<ProductDto>(product);
 
             var categories = await _categoryService.GetCategoriesAsync();
             ViewBag.CategoryId = new SelectList(categories, "Id", "Name", productDto.CategoryId);
@@ -79,7 +79,7 @@ namespace CleanArch.WebUI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ProductDTO productDto)
+        public async Task<IActionResult> Edit(ProductDto productDto)
         {
             if (ModelState.IsValid)
             {
@@ -102,7 +102,7 @@ namespace CleanArch.WebUI.Controllers
             var product = await _mediator.Send(new GetProductByIdQuery(id.Value));
             if (product == null) return NotFound();
 
-            var productDto = _mapper.Map<ProductDTO>(product);
+            var productDto = _mapper.Map<ProductDto>(product);
             return View(productDto);
         }
 
@@ -122,7 +122,7 @@ namespace CleanArch.WebUI.Controllers
             var product = await _mediator.Send(new GetProductByIdQuery(id.Value));
             if (product == null) return NotFound();
 
-            var productDto = _mapper.Map<ProductDTO>(product);
+            var productDto = _mapper.Map<ProductDto>(product);
 
             var imagePath = Path.Combine(_environment.WebRootPath, "images", productDto.Image ?? string.Empty);
             ViewBag.ImageExist = System.IO.File.Exists(imagePath);

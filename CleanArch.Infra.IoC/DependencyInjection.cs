@@ -36,8 +36,8 @@ namespace CleanArch.Infra.IoC
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICategoryService, CategoryService>();
-            services.AddAutoMapper(cfg => cfg.AddProfile<DomainToDTOMappingProfile>());
-            services.AddAutoMapper(cfg => cfg.AddProfile<DTOToCommandMappingProfile>());
+            services.AddAutoMapper(cfg => cfg.AddProfile<DomainToDtoMappingProfile>());
+            services.AddAutoMapper(cfg => cfg.AddProfile<DtoToCommandMappingProfile>());
 
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(AppDomain.CurrentDomain.Load("CleanArch.Application")));
